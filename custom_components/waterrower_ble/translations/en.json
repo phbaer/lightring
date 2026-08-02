@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Select a WaterRower device",
+        "description": "Choose a currently reachable LightRing or SmartRow. Home Assistant scans local adapters and Bluetooth proxies."
+      },
+      "bluetooth_confirm": {
+        "title": "Set up {name}",
+        "description": "Add this WaterRower device. A connectable Bluetooth adapter or proxy must be in range."
+      }
+    },
+    "abort": {
+      "not_supported": "This is not a supported WaterRower device.",
+      "already_configured": "This WaterRower device is already configured."
+    },
+    "error": {
+      "no_devices": "No reachable LightRing or SmartRow was found. Ensure it is powered on and a connectable Bluetooth adapter or proxy is in range.",
+      "device_not_found": "The selected WaterRower device is no longer reachable. Scan again and select it."
+    }
+  }
+}

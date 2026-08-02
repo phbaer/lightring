@@ -1,0 +1,23 @@
+{
+  "domain": "waterrower_ble",
+  "name": "WaterRower Local BLE",
+  "version": "0.2.23",
+  "documentation": "https://github.com/phbaer/waterrower-local-ble",
+  "issue_tracker": "https://github.com/phbaer/waterrower-local-ble/issues",
+  "config_flow": true,
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "dependencies": ["bluetooth"],
+  "bluetooth": [
+    {
+      "connectable": true,
+      "local_name": "LightRing BF"
+    },
+    {
+      "connectable": true,
+      "local_name": "SmartRow"
+    }
+  ],
+  "requirements": [],
+  "codeowners": ["@phbaer"]
+}

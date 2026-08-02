@@ -1,0 +1,14 @@
+set_pixels:
+  name: Set individual LEDs
+  description: Set up to 52 LED colors in physical ring order.
+  fields:
+    address:
+      required: true
+      example: "D7:FC:EB:0B:B5:BF"
+      selector:
+        text:
+    pixels:
+      required: true
+      example: "[[255, 0, 0], [0, 255, 0], [0, 0, 255]]"
+      selector:
+        object:

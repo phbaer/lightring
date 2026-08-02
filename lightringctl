@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Local controller for a WaterRower LightRing BLE (firmware protocol v2.1).
+# Requires BlueZ, gdbus, and a previously discovered LightRing BF.
+set -euo pipefail
+
+readonly DEVICE_PATH="/org/bluez/hci0/dev_D7_FC_EB_0B_B5_BF"
+readonly CONTROL_PATH="${DEVICE_PATH}/service000e/char0016"
+
+usage() {
+  printf 'Usage: %s {off|red|green|blue|white|rgb R G B}\n' "$0"
+}
+
+case "${1:-}" in
+  off)   green=0; red=0; blue=0 ;;
+  red)   green=0; red=255; blue=0 ;;
+  green) green=255; red=0; blue=0 ;;
+  blue)  green=0; red=0; blue=255 ;;
+  white) green=255; red=255; blue=255 ;;
+  rgb)
+    [[ $# -eq 4 ]] || { usage >&2; exit 2; }
+    red=$2; green=$3; blue=$4
+    for component in "$red" "$green" "$blue"; do
+      [[ "$component" =~ ^([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$ ]] || {
+        printf 'RGB values must be integers from 0 through 255.\n' >&2
+        exit 2
+      }
+    done
+    ;;
+  *) usage >&2; exit 2 ;;
+esac
+
+# The device's current address is a random-static address. Update DEVICE_PATH
+# above if it changes after a factory reset or firmware update.
+connected=false
+cleanup() {
+  if [[ "$connected" == true ]]; then
+    gdbus call --system --dest org.bluez --object-path "$DEVICE_PATH" \
+      --method org.bluez.Device1.Disconnect >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
+
+gdbus call --system --dest org.bluez --object-path "$DEVICE_PATH" \
+  --method org.bluez.Device1.Connect >/dev/null
+connected=true
+
+# Command 0 is a solid colour; its payload order is G, R, B.
+gdbus call --system --dest org.bluez --object-path "$CONTROL_PATH" \
+  --method org.bluez.GattCharacteristic1.WriteValue \
+  "[byte 0x00, $green, $red, $blue]" '{}' >/dev/null
+
+cleanup
+connected=false
+
+printf 'LightRing set to RGB(%s, %s, %s).\n' "$red" "$green" "$blue"
